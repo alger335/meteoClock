@@ -1,29 +1,72 @@
 void checkBrightness() {
+  //сделай testTimer
   if (LCD_BRIGHT == 11) {                         // если установлен автоматический режим для экрана (с)НР
-    if (analogRead(PHOTO) < BRIGHT_THRESHOLD) {   // если темно
+    PHOTO_READ = analogRead(PHOTO);
+    //Serial.println(PHOTO_READ);
+    if (PHOTO_READ >= BRIGHT_THRESHOLD) {
+      LED_CF = PHOTO_READ;
+    }
+    else {
+      LED_CF = BRIGHT_THRESHOLD;
+    }
+    BRIGHT_VALUE = map(LED_CF, BRIGHT_THRESHOLD, 1023, LCD_BRIGHT_MIN, LCD_BRIGHT_MAX);
+    //Serial.println(LED_CF);
+    analogWrite(BACKLIGHT, BRIGHT_VALUE);
+  }
+  else {
+    analogWrite(BACKLIGHT, LCD_BRIGHT * LCD_BRIGHT * 2.5);
+  }
+/*
+  if (LCD_BRIGHT == 11) {                         // если установлен автоматический режим для экрана (с)НР
+    if (analogRead(PHOTO) < ) {   // если темно
       analogWrite(BACKLIGHT, LCD_BRIGHT_MIN);
-    } else {                                      // если светло
+    } 
+    else {                                      // если светло
       analogWrite(BACKLIGHT, LCD_BRIGHT_MAX);
     }
   } else {
     analogWrite(BACKLIGHT, LCD_BRIGHT * LCD_BRIGHT * 2.5);
   }
-
+}*/
   if (LED_BRIGHT == 11) {                         // если установлен автоматический режим для индикатора (с)НР
-    if (analogRead(PHOTO) < BRIGHT_THRESHOLD) {   // если темно
-#if (LED_MODE == 0)
-      LED_ON = (LED_BRIGHT_MIN);
-#else
-      LED_ON = (255 - LED_BRIGHT_MIN);
-#endif
-    } else {                                      // если светло
-#if (LED_MODE == 0)
-      LED_ON = (LED_BRIGHT_MAX);
-#else
-      LED_ON = (255 - LED_BRIGHT_MAX);
-#endif
+    PHOTO_READ = analogRead(PHOTO);
+    //Serial.println(PHOTO_READ);
+    if (PHOTO_READ >= BRIGHT_THRESHOLD) {
+      LED_CF = PHOTO_READ;
     }
+    else {
+      LED_CF = BRIGHT_THRESHOLD;
+    }
+    BRIGHT_VALUE = map(LED_CF, BRIGHT_THRESHOLD, 1023, LED_BRIGHT_MIN, LED_BRIGHT_MAX);
+
+    #if (LED_MODE == 0) 
+      LED_ON = BRIGHT_VALUE;
+    #else
+      if (analogRead(PHOTO) < BRIGHT_THRESHOLD) {
+        LED_ON = (255 - LED_BRIGHT_MIN);
+      }
+      else {
+        LED_ON = (255 - LED_BRIGHT_MAX);
+      }
+    #endif
   }
+/*
+    if (analogRead(PHOTO) < BRIGHT_THRESHOLD) {   // если темно
+      #if (LED_MODE == 0)
+        LED_ON = (LED_BRIGHT_MIN);
+      #else
+        LED_ON = (255 - LED_BRIGHT_MIN);
+      #endif
+    } 
+    else {                                      // если светло
+      #if (LED_MODE == 0)
+        LED_ON = (LED_BRIGHT_MAX);
+      #else
+        LED_ON = (255 - LED_BRIGHT_MAX);
+      #endif
+    }
+    
+  }*/
 }
 
 /*
@@ -341,7 +384,7 @@ void drawSensors() {
       if (mode0scr != 1) lcd.setCursor(15, 0);
     }
     lcd.print(String(dispTemp, 1));
-    lcd.write(223);
+    lcd.write(67);
   } else {
     drawTemp(dispTemp, 0, 0);
   }
@@ -410,7 +453,7 @@ void drawSensors() {
   if (!bigDig) {              // если только мелкими цифрами (с)НР
     lcd.setCursor(0, 0);
     lcd.print(String(dispTemp, 1));
-    lcd.write(223);
+    lcd.write(67);
     lcd.setCursor(6, 0);
     lcd.print(String(dispHum) + "% ");
 
@@ -595,7 +638,15 @@ void clockTick() {
     //Serial.print("Значение: " + String(analogRead(A0))); Serial.print(" Напряжение0: " + String(analogRead(A0) * 5.2 / 1023.0)); Serial.print(" Напряжение1: " + String(analogRead(A1) * 5.2 / 1023.0)); Serial.print(" Статус: " + String(powerStatus));  Serial.println(" Статус2: " + String((constrain((int)analogRead(A0) * 5.0 / 1023.0, 3.0, 4.2) - 3.0) / ((4.2 - 3.0) / 6.0) + 1)); //отладка (с)НР
 
     byte code;
-    if (dotFlag) code = 165;
+
+        if (dotFlag) {
+      if (bigDig && DISPLAY_TYPE == 1) {
+        code = 3;
+      }
+      else if (!bigDig && DISPLAY_TYPE == 1) {
+        code = 46;
+      }
+    }
     else code = 32;
     if (mode0scr == 0 && (bigDig && DISPLAY_TYPE == 0 || DISPLAY_TYPE == 1)) {          // мигание большими точками только в нулевом режиме главного экрана (с)НР
       if (bigDig && DISPLAY_TYPE == 1) lcd.setCursor(7, 2);
@@ -605,11 +656,11 @@ void clockTick() {
       lcd.write(code);
     }
     else {
-#if (DISPLAY_TYPE == 1)
-      if (code == 165) code = 58;
-      lcd.setCursor(17, 3);
-      lcd.write(code);
-#endif
+      #if (DISPLAY_TYPE == 1)
+        if (code == 3 || code == 2) code = 58;
+        lcd.setCursor(17, 3);
+        lcd.write(code);
+      #endif
     }
   }
 
