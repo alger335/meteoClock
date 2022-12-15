@@ -368,7 +368,7 @@ void drawDig(byte dig, byte x, byte y) {  // рисуем цифры (с)НР --
         digSeg(x, y, 3, 3, 6, 4, 4, 6);
         break;
       case 4:
-        digSeg(x, y, 6, 0, 6, 5, 5, 6);
+        digSeg(x, y, 6, 32, 6, 5, 5, 6);
         break;
       case 5:
         digSeg(x, y, 6, 3, 3, 4, 4, 6);
