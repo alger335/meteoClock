@@ -627,13 +627,13 @@ void clockTick() {
           if ((7 - powerStatus) < i) DC[i] = 0b11111;
           else DC[i] = 0b10001;
         }
-        lcd.createChar(6, DC);
-      } else lcd.createChar(6, AC);
+        lcd.createChar(9, DC);
+      } else lcd.createChar(9, AC);
 
       if (mode0scr != 1) lcd.setCursor(19, 2);
       else lcd.setCursor(19, 0);
       if (!dotFlag && powerStatus == 1) lcd.write(32);
-      else lcd.write(6);
+      else lcd.write(9);
     }
     //Serial.print("Значение: " + String(analogRead(A0))); Serial.print(" Напряжение0: " + String(analogRead(A0) * 5.2 / 1023.0)); Serial.print(" Напряжение1: " + String(analogRead(A1) * 5.2 / 1023.0)); Serial.print(" Статус: " + String(powerStatus));  Serial.println(" Статус2: " + String((constrain((int)analogRead(A0) * 5.0 / 1023.0, 3.0, 4.2) - 3.0) / ((4.2 - 3.0) / 6.0) + 1)); //отладка (с)НР
 
